@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        #error{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h2>用户注册</h2>
+    <form method="post" name="myform" action="save.php">
+        用户名：
+        <input type="text" name="uname"><br>
+        手机号：
+        <input type="tel" id="phone" name="phone" pattern="^1[3456789]\d{9}" title="请输入手机号"><span id="error"></span><br>
+        密码：
+        <input type="password" name="pwd"><br>
+        <input type="submit" value="提交" name="">
+    </form>
+
+    <script>
+    var phone=document.getElementById("phone");
+    var error=document.getElementById("error");
+    phone.onblur=function(){
+        // 用正则判断手机号是否正确
+        if(!/^1[3456789]\d{9}$/.test(phone.value)){
+            error.innerText="手机号不正确，请重新输入！";
+            return false;
+        }else{
+            error.innerText="";
+        }
+        // 如果手机号格式正确，再通过ajax访问后台地址，去验证用户输入的手机号是否存在于数据库中
+        var xhr=new XMLHttpRequest();
+        xhr.open("get","getPhoneNum.php?phone="+phone.value);
+        xhr.send();
+        xhr.onreadystatechange=function(){
+            if(xhr.readyState==4&&xhr.status==200){
+                // console.dir(xhr.response)
+                if(xhr.responseText==1){
+                    error.innerHTML="该手机号已经被注册，您可以<a href='login.html'>直接登录！</a>";
+                    // location.href="login.html"
+                    return false;
+                }
+            }
+        } 
+
+    }
+
+    // 提交时，如果有报错信息，则无法提交
+    document.myform.onsubmit=function(){
+        if(error.innerText!=""){
+            alert("请修正错误再提交数据！");
+            return false;
+        }
+    }
+    </script>
+</body>
+</html>
